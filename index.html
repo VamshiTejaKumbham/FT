@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workout Split Tracker</title>
+<title>Workout Plan</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -34,306 +34,65 @@
     --radius-lg: 14px;
   }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 0;
-  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0; }
 
-  .header {
-    background: var(--teal-deep);
-    padding: 2rem 1.5rem 1.5rem;
-    color: #fff;
-  }
-
+  .header { background: var(--teal-deep); padding: 2rem 1.5rem 1.5rem; color: #fff; }
   .header-inner { max-width: 700px; margin: 0 auto; }
+  .header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 4px; }
+  .header p { font-size: 13px; opacity: 0.65; margin-bottom: 1.2rem; }
 
-  .header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-    margin-bottom: 4px;
-  }
+  .overall-progress { display: flex; align-items: center; gap: 12px; }
+  .overall-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,0.2); border-radius: 20px; overflow: hidden; }
+  .overall-bar { height: 100%; background: #5DCAA5; border-radius: 20px; transition: width 0.4s ease; }
+  .overall-pct { font-size: 12px; font-family: 'DM Mono', monospace; opacity: 0.8; min-width: 36px; text-align: right; }
 
-  .header p {
-    font-size: 13px;
-    opacity: 0.65;
-    margin-bottom: 1.2rem;
-  }
-
-  .overall-progress {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .overall-bar-wrap {
-    flex: 1;
-    height: 5px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
-    overflow: hidden;
-  }
-
-  .overall-bar {
-    height: 100%;
-    background: #5DCAA5;
-    border-radius: 20px;
-    transition: width 0.4s ease;
-  }
-
-  .overall-pct {
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-    opacity: 0.8;
-    min-width: 36px;
-    text-align: right;
-  }
-
-  .tabs-wrap {
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .tabs {
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
+  .tabs-wrap { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+  .tabs { max-width: 700px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
-
-  .tab {
-    flex-shrink: 0;
-    padding: 14px 18px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.15s;
-    white-space: nowrap;
-    user-select: none;
-  }
-
+  .tab { flex-shrink: 0; padding: 14px 18px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; user-select: none; }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--green-dark); border-bottom-color: var(--green); }
   .tab.complete { color: var(--green); }
 
   .content { max-width: 700px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 
-  .day-header { margin-bottom: 1.2rem; }
+  .day-title { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 3px; }
+  .day-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1rem; }
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .progress-label { font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace; min-width: 90px; }
+  .prog-bar-wrap { flex: 1; height: 5px; background: #e8e6e0; border-radius: 20px; overflow: hidden; }
+  .prog-bar { height: 100%; background: var(--green); border-radius: 20px; transition: width 0.3s ease; }
 
-  .day-title {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-    margin-bottom: 3px;
-  }
-
-  .day-sub {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 1rem;
-  }
-
-  .progress-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1rem;
-  }
-
-  .progress-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-family: 'DM Mono', monospace;
-    min-width: 90px;
-  }
-
-  .prog-bar-wrap {
-    flex: 1;
-    height: 5px;
-    background: #e8e6e0;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-
-  .prog-bar {
-    height: 100%;
-    background: var(--green);
-    border-radius: 20px;
-    transition: width 0.3s ease;
-  }
-
-  .warning-box {
-    background: var(--amber-light);
-    border: 1px solid var(--amber-border);
-    border-radius: var(--radius);
-    padding: 10px 14px;
-    font-size: 12px;
-    color: var(--amber);
-    margin-bottom: 1rem;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-  }
-
+  .warning-box { background: var(--amber-light); border: 1px solid var(--amber-border); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--amber); margin-bottom: 1rem; display: flex; gap: 8px; align-items: flex-start; }
   .warning-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
 
-  .section-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-hint);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin: 1.3rem 0 0.5rem;
-    font-family: 'DM Mono', monospace;
-  }
+  .section-label { font-size: 10px; font-weight: 600; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.08em; margin: 1.3rem 0 0.5rem; font-family: 'DM Mono', monospace; }
 
-  .warmup-card {
-    background: var(--green-light);
-    border-radius: var(--radius);
-    padding: 10px 14px;
-    font-size: 13px;
-    color: var(--green-dark);
-    margin-bottom: 0.5rem;
-    border: 1px solid rgba(29,158,117,0.2);
-  }
+  .warmup-card { background: var(--green-light); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: var(--green-dark); margin-bottom: 0.5rem; border: 1px solid rgba(29,158,117,0.2); }
+  .warmup-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; opacity: 0.7; }
 
-  .warmup-label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin-bottom: 4px;
-    opacity: 0.7;
-  }
-
-  .ex-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    background: var(--card);
-    margin-bottom: 6px;
-    cursor: pointer;
-    transition: background 0.12s, opacity 0.2s;
-  }
-
+  .ex-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--card); margin-bottom: 6px; cursor: pointer; transition: background 0.12s, opacity 0.2s; }
   .ex-row:hover { background: #fafaf8; }
+  .ex-row.done { opacity: 0.45; background: #fafaf8; }
 
-  .ex-row.done {
-    opacity: 0.45;
-    background: #fafaf8;
-  }
-
-  .checkbox {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    border-radius: 5px;
-    border: 1.5px solid var(--border-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 1px;
-    transition: all 0.15s;
-    background: #fff;
-  }
-
-  .checkbox.checked {
-    background: var(--green);
-    border-color: var(--green);
-  }
-
-  .tick {
-    width: 10px;
-    height: 6px;
-    border-left: 2px solid #fff;
-    border-bottom: 2px solid #fff;
-    transform: rotate(-45deg) translateY(-1px);
-  }
+  .checkbox { width: 20px; height: 20px; min-width: 20px; border-radius: 5px; border: 1.5px solid var(--border-md); display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.15s; background: #fff; }
+  .checkbox.checked { background: var(--green); border-color: var(--green); }
+  .tick { width: 10px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); }
 
   .ex-body { flex: 1; min-width: 0; }
+  .ex-name { font-size: 14px; font-weight: 500; color: var(--text); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; line-height: 1.4; }
+  .ex-detail { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-family: 'DM Mono', monospace; }
+  .ex-note { font-size: 11.5px; color: var(--green-dark); margin-top: 4px; font-style: italic; line-height: 1.5; }
 
-  .ex-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    line-height: 1.4;
-  }
-
-  .ex-detail {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 3px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .ex-note {
-    font-size: 11.5px;
-    color: var(--green-dark);
-    margin-top: 4px;
-    font-style: italic;
-    line-height: 1.5;
-  }
-
-  .badge {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-style: normal;
-    font-family: 'DM Sans', sans-serif;
-  }
-
+  .badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; font-style: normal; font-family: 'DM Sans', sans-serif; }
   .badge-superset { background: var(--blue-light); color: var(--blue); }
-  .badge-giant { background: var(--purple-light); color: var(--purple); }
   .badge-dropset { background: var(--coral-light); color: var(--coral); }
+  .badge-safe { background: var(--green-light); color: var(--green-dark); }
 
-  .cardio-card {
-    background: #f0ede6;
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-top: 1.2rem;
-    border: 1px solid var(--border);
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
+  .cardio-card { background: #f0ede6; border-radius: var(--radius); padding: 12px 16px; font-size: 13px; color: var(--text-muted); margin-top: 1.2rem; border: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
   .cardio-icon { font-size: 16px; }
 
-  .reset-btn {
-    display: block;
-    font-size: 12px;
-    color: var(--text-hint);
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-    margin-top: 1rem;
-    text-decoration: underline;
-    font-family: 'DM Sans', sans-serif;
-  }
-
+  .reset-btn { display: block; font-size: 12px; color: var(--text-hint); cursor: pointer; background: none; border: none; padding: 0; margin-top: 1rem; text-decoration: underline; font-family: 'DM Sans', sans-serif; }
   .reset-btn:hover { color: var(--text-muted); }
 </style>
 </head>
@@ -341,127 +100,120 @@
 
 <div class="header">
   <div class="header-inner">
-    <h1>Workout Split</h1>
-    <p>Hypertrophy · Strength · LB Safe</p>
+    <h1>🏋️‍♂️</h1>
+    <p>Hypertrophy · Strength · L4-L5 back-safe</p>
     <div class="overall-progress">
-      <div class="overall-bar-wrap">
-        <div class="overall-bar" id="overall-bar" style="width:0%"></div>
-      </div>
+      <div class="overall-bar-wrap"><div class="overall-bar" id="overall-bar" style="width:0%"></div></div>
       <div class="overall-pct" id="overall-pct">0%</div>
     </div>
   </div>
 </div>
 
-<div class="tabs-wrap">
-  <div class="tabs" id="tabs"></div>
-</div>
-
+<div class="tabs-wrap"><div class="tabs" id="tabs"></div></div>
 <div class="content" id="content"></div>
 
 <script>
+const days = [
 
-const days = 
- [
-  {
-    label: "Day 1", title: "Upper body — push focus", sub: "Chest · Shoulders · Triceps",
-    warmup: "5 min incline treadmill walk + shoulder rotations + band pull-aparts (2×15)",
-    warning: null,
+   {
+    label: "Day 1", title: "Legs — strength focus", sub: "Quads · Hamstrings · Glutes · Calves",
+    warmup: "10 min cycling (easy) + hip circles + leg swings + glute activation band walks × 15",
+    warning: "L4-L5: No barbell back squat, no conventional deadlift, no Romanian deadlift. All work is machine-supported or low spinal load. Lower back must stay pressed to pad on leg press at all times.",
     exercises: [
-      { name: "Barbell Flat Bench Press", detail: "4 × 8 (heavy)", note: "Control the eccentric 3 sec down. No arching lower back off bench." },
-      { name: "Incline Dumbbell Press", detail: "4 × 12–15", note: "Full stretch at bottom. 30° incline, not 45°." },
-      { name: "Cable Chest Fly (low to high)", detail: "3 × 15", note: "Upper chest isolation without spinal load." },
-      { name: "Dumbbell Shoulder Press", detail: "4 × 10", note: "Seated. Keep lower back flat against pad.", section: "shoulders" },
-      { name: "Lateral Raises — Drop Set", detail: "3 drop sets: 15 → 12 → failure", note: "Controlled tempo. No swinging.", badge: "dropset" },
-      { name: "Overhead Cable Tricep Extension", detail: "3 × 12", note: null, section: "triceps" },
-      { name: "Tricep Dips (bench/assisted)", detail: "3 × 12–15", note: "Lean slightly forward for chest emphasis." },
+      { name: "Leg Press (feet mid-high on plate)", detail: "5 × 10 (primary strength lift)", note: "Don't lock knees at top. Lower back stays on pad. Don't go past 90° if uncomfortable.", section: "quad & glute dominant", badge: "safe" },
+      { name: "Goblet Squat (2-sec pause at bottom)", detail: "4 × 8", note: "Dumbbell held at chest — controls spinal load. Stay upright. Full depth.", badge: "safe" },
+      { name: "Rear-Foot Elevated Split Squat (light DBs)", detail: "3 × 10 per leg", note: "Slow eccentric. Torso upright. Great glute driver without spinal loading.", badge: "safe" },
+      { name: "Seated Hamstring Curl", detail: "4 × 12", note: "Prefer seated over lying — safer for L4-L5. Full range, slow eccentric.", section: "hamstrings & isolation", badge: "safe" },
+      { name: "Leg Extension", detail: "3 × 15", note: "Slow and controlled. Pause 1 sec at full extension." },
+      { name: "Glute Bridge (barbell across hips)", detail: "3 × 12", note: "Drive through heels. Squeeze glutes hard at top. Supine — fully spine-safe.", section: "glutes & calves", badge: "safe" },
+      { name: "Single-Leg Calf Raise (standing)", detail: "4 × 15", note: "Hold a dumbbell for load. Full stretch at bottom — don't bounce." },
+      { name: "Dead Bug", detail: "3 × 10 per side", note: "Press lower back into floor the entire time. Opposite arm/leg extension.", section: "core", badge: "safe" },
     ],
-    cardio: "15 min incline treadmill walk"
+    cardio: "20 min stair climber or cycling"
   },
   {
-    label: "Day 2", title: "Lower body — quad & glute focus", sub: "Quads · Glutes · Hamstrings · Calves",
-    warmup: "5 min stationary bike + hip flexor stretch + glute activation band walks (2×15)",
-    warning: "L4-L5: No barbell back squats or Romanian deadlifts. All work is machine/supported or low-spinal-load.",
+    label: "Day 2", title: "Push — strength focus", sub: "Chest · Shoulders · Triceps",
+    warmup: "5 min incline treadmill + band pull-aparts × 20 + shoulder rotations",
+    warning: "Keep bench press arch natural — don't exaggerate the lower back arch. No behind-the-neck pressing.",
     exercises: [
-      { name: "Leg Press (feet shoulder-width, mid-platform)", detail: "4 × 12", note: "Do NOT lock knees at top. Keep lower back against pad throughout." },
-      { name: "Hack Squat Machine", detail: "4 × 10", note: "Safe spinal alternative to barbell squats. Full depth if comfortable." },
-      { name: "Bulgarian Split Squat (light DBs)", detail: "3 × 10 each leg", note: "Keep torso upright. Don't let front knee cave in." },
-      { name: "Seated Hamstring Curl", detail: "4 × 12", note: "Prefer seated over lying — safer for L4-L5.", section: "hamstrings & isolation" },
-      { name: "Leg Extension", detail: "3 × 15", note: "Full extension. Pause 1 sec at top." },
-      { name: "Glute Bridge (barbell across hips)", detail: "4 × 15", note: "Drive through heels. Squeeze glutes at top. Safe for back.", section: "glutes & calves" },
-      { name: "Standing Calf Raise (machine)", detail: "4 × 15 — pause at top", note: null },
+      { name: "Barbell Flat Bench Press", detail: "5 × 5 (heavy — primary strength lift)", note: "Rest 2.5 min between sets. Control the 3-sec eccentric.", section: "chest" },
+      { name: "Incline Dumbbell Press", detail: "4 × 10", note: "Full stretch at bottom. 3-sec eccentric. Use 30° incline, not 45°." },
+      { name: "Machine Chest Fly", detail: "3 × 15", note: "Upper chest isolation — no spinal load. Squeeze hard at peak.", badge: "safe" },
+      { name: "Seated DB Shoulder Press", detail: "4 × 10", note: "Seated — keep lower back flat against pad. Don't lock out at top.", section: "shoulders" },
+      { name: "Cable Lateral Raise", detail: "4 × 15 — drop set on last set", note: "Controlled tempo, no swinging. Drop set: strip weight and go to failure.", badge: "dropset" },
+      { name: "Overhead Cable Tricep Extension", detail: "3 × 12", note: "Full stretch overhead. Elbows close to head.", section: "triceps" },
+      { name: "Tricep Dips (machine or bench)", detail: "3 × 12", note: "Use assisted machine if needed. Lean slightly forward for chest emphasis." },
+      { name: "Hanging Leg Raises", detail: "3 × 15", note: "Core finisher. Dead stop each rep — no swinging.", section: "core", badge: "safe" },
     ],
-    cardio: "20 min stair climber or cycling (low resistance)"
-  },
- {
-  label: "Day 3",
-  title: "Core + forearms — stability & grip",
-  sub: "Deep core · Obliques · Grip · Forearms",
-  warmup: "5 min light cardio + wrist rotations + cat-cow + pelvic tilts",
-  warning: "L4-L5: Avoid spinal flexion. Keep all core work neutral spine.",
-  progression: "Increase hold time, reps, or grip load weekly",
-  exercises: [
-
-    // CORE BLOCK
-    { name: "Dead Bug", detail: "3 × 10 per side", note: "Lower back pressed into floor." },
-    { name: "Pallof Press", detail: "3 × 12 per side", note: "Anti-rotation control." },
-    { name: "Hanging Knee Raise", detail: "3 × 10–12", note: "No swinging." },
-    { name: "Plank", detail: "3 × 45–60 sec", note: "Glutes tight, ribs down." },
-
-    // FOREARM / GRIP BLOCK
-    { name: "Farmer Carry (heavy)", detail: "4 × 40–60 sec", note: "Primary grip builder. Stay upright.", badge: "functional" },
-    { name: "Wrist Curl (DB or barbell)", detail: "3 × 15", note: "Slow eccentric.", section: "forearms" },
-    { name: "Reverse Wrist Curl", detail: "3 × 15", note: "Balances forearm development." },
-    { name: "Hammer Curl (light)", detail: "3 × 12", note: "Brachialis + forearm thickness." },
-    { name: "Dead Hang (bar hold)", detail: "2–3 × max time", note: "Passive grip endurance finisher." }
-
-  ],
-  cardio: "15–20 min incline walk or rowing"
-},
-  {
-    label: "Day 4", title: "Shoulders & arms", sub: "Delts · Biceps · Triceps",
-    warmup: "5 min elliptical + shoulder CARs + band pull-aparts",
-    warning: null,
-    exercises: [
-      { name: "Seated Dumbbell Shoulder Press", detail: "4 × 10 (heavier than Day 1)", note: "Seated to protect lower back. Full range." },
-      { name: "Cable Lateral Raise", detail: "4 × 15 per side", note: "Single-arm cable keeps constant tension vs dumbbells." },
-      { name: "Rear Delt Fly (cable or machine)", detail: "4 × 15", note: "Elbows slightly bent. Lead with elbows not hands." },
-      { name: "Face Pull (rope cable)", detail: "3 × 20", note: "Pull to eye level. External rotate at end. Essential for shoulder health." },
-      { name: "EZ Bar Curl → Rope Pushdown Superset", detail: "4 × 10 each", note: "Minimal rest between. Full stretch on curl, full lockout on pushdown.", badge: "superset", section: "arms" },
-      { name: "Incline DB Curl (60° incline)", detail: "3 × 12", note: "Long head bias. Elbows stay behind body." },
-      { name: "Overhead DB Tricep Extension", detail: "3 × 12", note: "Elbows close. Long head emphasis. Keep core braced." },
-    ],
-    cardio: "15 min moderate cardio — bike or cross trainer"
+    cardio: "15 min incline treadmill walk (not running — L4-L5 protection)"
   },
   {
-    label: "Day 5", title: "Legs — hamstring & posterior chain", sub: "Hamstrings · Glutes · Calves · Stability",
-    warmup: "5 min bike + lying hip stretch + glute bridges (2×15 bodyweight)",
-    warning: "L4-L5: Posterior chain focus but still machine-dominant. No conventional deadlifts.",
+    label: "Day 3", title: "Pull — strength focus", sub: "Back · Biceps · Rear Delts",
+    warmup: "5 min elliptical + band face pulls × 20 + lat stretch",
+    warning: "No bent-over barbell rows, T-bar rows, or cable pullovers with spinal loading. Chest-supported work only for rows.",
     exercises: [
-      { name: "Leg Press (feet high on platform)", detail: "4 × 12", note: "High foot placement shifts load to hamstrings and glutes." },
-      { name: "Seated Leg Curl → Leg Extension Superset", detail: "4 × 12 each, no rest between", note: "Keeps quads and hams both pumped.", badge: "superset" },
-      { name: "Glute-Ham Raise (machine, assisted)", detail: "3 × 8–10", note: "If unavailable, use lying leg curl.", section: "posterior chain" },
-      { name: "Rear-Foot Elevated Split Squat (light DBs)", detail: "3 × 12 per leg", note: "Torso upright. Hits glutes and quads without spinal load." },
-      { name: "Single-Leg Calf Raise (on step)", detail: "4 × 15 per side", note: "Full range — deep stretch at bottom.", section: "calves & glutes" },
-      { name: "Hip Thrust (barbell or machine)", detail: "4 × 12", note: "Best glute builder that keeps spine safe. Full extension at top." },
+      { name: "Chest-Supported Incline DB Row", detail: "4 × 10", note: "Chest flat on pad — zero lower back involvement. Drive elbows back.", section: "back", badge: "safe" },
+      { name: "Lat Pulldown (overhand grip)", detail: "4 × 10", note: "Drive elbows to hips — don't just pull with arms. Full stretch at top." },
+      { name: "Seated Cable Row (neutral grip)", detail: "3 × 12", note: "Brace core. Retract scapula first, then pull. Don't round the lower back.", badge: "safe" },
+      { name: "Face Pull (rope cable)", detail: "4 × 15", note: "Pull to eye level. External rotate at the end. Essential for shoulder health and posture." },
+      { name: "Single-Arm DB Row", detail: "3 × 12 per arm", note: "Knee on bench for back support. Full range — let the lat fully stretch.", badge: "safe" },
+      { name: "Incline DB Curl", detail: "3 × 12", note: "60° incline. Elbows stay behind body — long head bias.", section: "biceps" },
+      { name: "Hammer Curl → Reverse Curl", detail: "3 × 10 + 10 (back-to-back)", note: "No rest between the two exercises. Builds brachialis and forearm thickness.", badge: "superset" },
+      { name: "Ab Wheel Rollout (from knees)", detail: "3 × 10", note: "Anti-extension core — fully spine-safe. Don't let hips sag.", section: "core", badge: "safe" },
     ],
-    cardio: "20 min stair climber or rowing"
+    cardio: "15 min cycling (seated — no standing climbs)"
   },
   {
-    label: "Day 6", title: "Chest & back — pull power", sub: "Chest · Lats · Rhomboids · Traps",
-    warmup: "5 min elliptical + thoracic rotations + lat stretch",
-    warning: null,
+    label: "Day 4", title: "Legs — stability & accessory", sub: "Quads · Hamstrings · Glutes · Calves · Core",
+    warmup: "Foam rolling — quads, IT band, glutes (5 min) + hip flexor stretch + lying glute stretch",
+    warning: "L4-L5: Lighter leg day — active recovery for the joints while still building volume. No heavy loading today.",
     exercises: [
-      { name: "Weighted Pull-Up (or lat pulldown)", detail: "5 × 5–8", note: "If bodyweight is easy, add 5-10kg belt. Full range." },
-      { name: "Chest-Supported Dumbbell Row", detail: "4 × 10–12 per arm", note: "Chest on incline bench — eliminates all lower back involvement." },
-      { name: "Incline Dumbbell Press", detail: "4 × 10", note: "Upper chest emphasis. Different angle from Day 1.", section: "chest" },
-      { name: "Seated Cable Row (close grip)", detail: "4 × 12", note: "Retract scapula first, then pull. Don't lean back excessively.", section: "rows" },
-      { name: "DB Flat Press → DB Pullover", detail: "3 rounds: 12 press + 15 pullover", note: "No rest between. Rest 90 sec after each round.", badge: "giant", section: "giant set" },
-      { name: "Face Pull (rope)", detail: "3 × 20", note: "Essential for rotator cuff and posture.", section: "upper back & traps" },
-      { name: "Paused Shrugs (DB)", detail: "3 × 12 — 2 sec pause at top", note: "Traps respond to slow, contracted reps." },
+      { name: "Leg Press (pump focus)", detail: "4 × 15 (lighter than Day 3)", note: "Short rest, 60 sec. Keep lower back flat on pad throughout.", section: "quad & hamstring", badge: "safe" },
+      { name: "Seated Leg Curl → Leg Extension", detail: "4 × 12 + 12 (back-to-back)", note: "No rest between. Keeps quads and hamstrings both pumped.", badge: "superset" },
+      { name: "Walking Lunges (DB)", detail: "3 × 12 per leg", note: "Keep torso upright — don't lean forward. Controlled step.", badge: "safe" },
+      { name: "Glute Bridge (bodyweight or light bar)", detail: "4 × 15", note: "Full hip extension each rep. Squeeze glutes hard at top.", section: "glutes", badge: "safe" },
+      { name: "Single-Leg Calf Raise", detail: "3 × 20", note: "Bodyweight or light dumbbell. Slow eccentric — full stretch at bottom.", section: "calves" },
+      { name: "Farmer Carry (heavy DBs)", detail: "3 × 40 sec", note: "Builds grip strength and spinal stability. Stay upright, core braced throughout.", badge: "safe" },
+      { name: "Bird Dog", detail: "3 × 12 per side", note: "Opposite arm/leg. Hold 2 sec at extension. Lower back rehab movement.", section: "core", badge: "safe" },
+      { name: "Front Plank", detail: "3 × 40 sec", note: "Glutes tight, ribs down, hips level. Spine fully neutral.", badge: "safe" },
     ],
-    cardio: "15–20 min incline walk or bike"
-  }
+    cardio: "20 min cycling or jump rope (low-impact preferred)"
+  },
+  {
+    label: "Day 5", title: "Push — hypertrophy focus", sub: "Chest · Shoulders · Triceps",
+    warmup: "Band shoulder circles × 20 + 5 min treadmill + thoracic rotations",
+    warning: "Volume day — don't try to match Day 1 weights. The goal is pump, time under tension, and muscle fatigue.",
+    exercises: [
+      { name: "DB Flat Press", detail: "4 × 12", note: "Higher rep range than Day 1. Focus on the squeeze at the top.", section: "chest" },
+      { name: "Machine Incline Press", detail: "3 × 15", note: "Safer than free weights on a second push day. Constant tension throughout." },
+      { name: "DB Pullover", detail: "3 × 15", note: "Chest + serratus anterior. Keep hips low. Full stretch overhead." },
+      { name: "Cable Front Raise → Cable Lateral Raise", detail: "3 × 12 + 12 (back-to-back)", note: "No rest between. Burns out the delts for maximum hypertrophy stimulus.", section: "shoulders", badge: "superset" },
+      { name: "Machine Shoulder Press", detail: "3 × 15", note: "Volume work — shorter rest (60 sec). Full range of motion." },
+      { name: "Skull Crusher (EZ Bar)", detail: "3 × 12", note: "Elbows pointed at ceiling. Full stretch at bottom.", section: "triceps" },
+      { name: "Cable Rope Pushdown", detail: "3 × 15 — drop set on last set", note: "Spread the rope at bottom for peak contraction. Drop to failure on the last set.", badge: "dropset" },
+      { name: "Cable Pallof Press", detail: "3 × 12 per side", note: "Anti-rotation core. Hold 1 sec at full extension. Fully spine-safe.", section: "core", badge: "safe" },
+    ],
+    cardio: "20 min incline walk"
+  },
+  {
+    label: "Day 6", title: "Pull — hypertrophy focus", sub: "Back · Biceps · Traps · Rear Delts",
+    warmup: "5 min rowing machine (easy pace) + band pull-aparts × 20",
+    warning: "No upright rows — they impinge the shoulder. Replace with extra face pulls if you want more rear delt volume.",
+    exercises: [
+      { name: "Lat Pulldown (wide overhand grip)", detail: "4 × 12", note: "Wide grip hits the lats differently. Drive elbows down and back.", section: "back" },
+      { name: "Lat Pulldown (close neutral grip)", detail: "3 × 15", note: "Different angle, same muscle — superset with the above for a double hit.", badge: "superset" },
+      { name: "Machine Row (chest pad)", detail: "4 × 12", note: "Chest-supported again — zero lower back load. Full retraction each rep.", badge: "safe" },
+      { name: "Rope Face Pull", detail: "4 × 20", note: "Lighter weight, full range. Rear delt + rotator cuff health. Don't rush it." },
+      { name: "EZ Bar Curl", detail: "4 × 10 (heavier than Day 2)", note: "Strict form. No swinging. Full supination at the top.", section: "biceps" },
+      { name: "Concentration Curl", detail: "3 × 12", note: "Elbow braced on inner thigh. 1-sec peak contraction squeeze." },
+      { name: "Paused Shrugs (DB)", detail: "3 × 15 — 2 sec hold at top", note: "Traps respond to slow contracted reps, not heavy bouncing.", section: "traps" },
+      { name: "Side Plank", detail: "3 × 35 sec each side", note: "Hips lifted — don't sag. Fully spine-safe lateral core work.", section: "core", badge: "safe" },
+    ],
+    cardio: "15 min cycling"
+  },
+  
 ];
+
 const state = {};
 days.forEach((d, di) => d.exercises.forEach((_, ei) => { state[`${di}-${ei}`] = false; }));
 let activeDay = 0;
@@ -489,7 +241,8 @@ function renderDay() {
   const done = dayDone(activeDay);
   const total = d.exercises.length;
   const pct = Math.round((done / total) * 100);
-  let html = `<div class="day-header">
+
+  let html = `<div style="margin-bottom:1.2rem;">
     <div class="day-title">${d.title}</div>
     <div class="day-sub">${d.sub}</div>
     <div class="progress-row">
@@ -506,17 +259,17 @@ function renderDay() {
     ${d.warmup}
   </div>`;
 
-  let lastSection = '';
+  let lastSection = null;
   d.exercises.forEach((ex, ei) => {
     const key = `${activeDay}-${ei}`;
     const checked = state[key];
     if (ex.section && ex.section !== lastSection) {
       lastSection = ex.section;
       html += `<div class="section-label">${ex.section}</div>`;
-    } else if (ei === 0) {
+    } else if (ei === 0 && !ex.section) {
       html += `<div class="section-label">compound lifts</div>`;
     }
-    const badge = ex.badge ? `<span class="badge badge-${ex.badge}">${ex.badge}</span>` : '';
+    const badge = ex.badge ? `<span class="badge badge-${ex.badge}">${ex.badge === 'safe' ? 'back-safe' : ex.badge}</span>` : '';
     html += `<div class="ex-row${checked ? ' done' : ''}" onclick="toggle('${key}')">
       <div class="checkbox${checked ? ' checked' : ''}">${checked ? '<div class="tick"></div>' : ''}</div>
       <div class="ex-body">
